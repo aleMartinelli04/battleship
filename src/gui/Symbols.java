@@ -13,6 +13,6 @@ public enum Symbols {
 
     @Override
     public String toString() {
-        return symbol + " ";
+        return symbol;
     }
 }

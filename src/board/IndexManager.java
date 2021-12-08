@@ -3,7 +3,7 @@ package board;
 public class IndexManager {
     private static int spaces = 0;
 
-    static String getCharOf(int x) {
+    public static String getCharOf(int x) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append((char) ((char) x + 'A')).append("  ");
@@ -18,7 +18,15 @@ public class IndexManager {
         return stringBuilder.toString();
     }
 
-    static int getIndexOf(int x) {
+    public static int getIndexOf(int x) {
+        return x + 1;
+    }
+
+    public static String getCharForGuiOf(int x) {
+        return String.valueOf((char) ((char) x + 'A'));
+    }
+
+    public static int getIndexForGuiOf(int x) {
         return x + 1;
     }
 }

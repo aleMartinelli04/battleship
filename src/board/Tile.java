@@ -3,6 +3,7 @@ package board;
 import gui.console.Colors;
 import gui.Symbols;
 import ships.Ship;
+import ships.exceptions.AllShipsSankException;
 import ships.exceptions.ShipSankException;
 
 public class Tile {
@@ -18,8 +19,13 @@ public class Tile {
         this(null);
     }
 
+
     public void setShip(Ship ship) {
         this.ship = ship;
+    }
+
+    public Ship getShip() {
+        return ship;
     }
 
     public boolean isChecked() {
@@ -27,7 +33,7 @@ public class Tile {
     }
 
     public void check() throws ShipSankException {
-        if (ship != null && state == TileState.NOT_CHECKED) {
+        if (isOccupied() && !isChecked()) {
             state = TileState.CHECKED;
             ship.hit();
         }
@@ -35,8 +41,25 @@ public class Tile {
         state = TileState.CHECKED;
     }
 
+    public TileState getState() {
+        return state;
+    }
+
     public boolean isOccupied() {
         return ship != null;
+    }
+
+
+    public Symbols getSymbol() {
+        if (state == TileState.NOT_CHECKED) {
+            return Symbols.UNKNOWN;
+        }
+
+        if (ship ==  null) {
+            return Symbols.WATER;
+        }
+
+        return Symbols.SHIP;
     }
 
     @Override

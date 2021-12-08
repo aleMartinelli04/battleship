@@ -4,12 +4,13 @@ import directions.Coordinate;
 import directions.Direction;
 import ships.Ship;
 import ships.Ships;
+import ships.exceptions.AllShipsSankException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class Board {
     private Tile[][] board;
@@ -24,15 +25,22 @@ public class Board {
         this.rows = rows;
         this.columns = columns;
 
-        ships = new ArrayList<>();
-        for (Ships shipEnum : Ships.values()) {
-            ships.add(new Ship(shipEnum));
-        }
+        this.ships = Arrays.stream(Ships.values())
+                .map(shipEnum -> new Ship(shipEnum))
+                .collect(Collectors.toList());
     }
 
 
     public Tile[][] getBoard() {
         return board;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getColumns() {
+        return columns;
     }
 
 
@@ -49,8 +57,8 @@ public class Board {
     }
 
     public void placeShips() {
-        for (int i = 0; i < ships.size(); i++) {
-            Ship ship = ships.get(i);
+        for (int i = 0; i < Ships.values().length; i++) {
+            Ship ship = new Ship(Ships.values()[i]);
 
             Coordinate startCoordinate = new Coordinate(
                     ThreadLocalRandom.current().nextInt(rows),
@@ -66,9 +74,8 @@ public class Board {
             for (Direction direction : randomizedDirections) {
                 Coordinate endCoordinate = startCoordinate.add(ship.getDimension(), direction);
 
-                Tile endTile;
                 try {
-                    endTile = tileIn(endCoordinate);
+                    Tile endTile = tileIn(endCoordinate);
                 } catch (Exception e) {
                     continue;
                 }
@@ -82,7 +89,8 @@ public class Board {
                             throw new Exception();
                         }
 
-                        List<Coordinate> nearCoordinates = coordinate.getNearCoordinates(direction, j == 0, j == coordinates.size()-1);
+                        List<Coordinate> nearCoordinates =
+                                coordinate.getNearCoordinates(direction, j == 0, j == coordinates.size() - 1);
                         for (Coordinate nearCoordinate : nearCoordinates) {
                             if (tileIn(nearCoordinate).isOccupied()) {
                                 throw new Exception();
@@ -103,6 +111,17 @@ public class Board {
         }
     }
 
+    public void shipSank(Ship ship) throws AllShipsSankException {
+        ships.remove(ships.stream()
+                .filter(ship1 -> ship1.toString().equals(ship.toString()))
+                .findFirst()
+                .orElse(null)
+        );
+
+        if (ships.isEmpty()) {
+            throw new AllShipsSankException(this);
+        }
+    }
 
     private void reset() {
         board = createEmptyBoard(rows, columns);
@@ -132,7 +151,7 @@ public class Board {
             Tile[] tiles = board[i];
             stringBuilder.append(IndexManager.getIndexOf(i)).append("\t");
             for (Tile tile : tiles) {
-                stringBuilder.append(tile).append(" ");
+                stringBuilder.append(tile).append("  ");
             }
 
             stringBuilder.append("\n");

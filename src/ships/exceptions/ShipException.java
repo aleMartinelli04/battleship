@@ -1,6 +1,6 @@
 package ships.exceptions;
 
-public class ShipException extends Exception {
+public abstract class ShipException extends Exception {
     public ShipException() {
     }
 
